@@ -817,12 +817,12 @@
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabName = this.getAttribute('data-tab');
-                    openTab(tabName);
+                    openTab(tabName, this);
                 });
             });
         }
 
-        function openTab(tabName) {
+        function openTab(tabName, button) {
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -831,7 +831,7 @@
             });
 
             document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
+            button.classList.add('active'); 
         }
 
         // Event Listeners
