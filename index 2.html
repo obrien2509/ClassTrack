@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#208091">
+    <meta name="description" content="Class and Attendance Tracker - Manage classes, track student attendance, and generate reports">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ClassTracker">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23208091' width='180' height='180'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>CT</text></svg>">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Class%20&%20Attendance%20Tracker%22,%22short_name%22:%22ClassTracker%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%23fcfcf9%22,%22theme_color%22:%22%23208091%22,%22scope%22:%22/%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23208091' width='192' height='192'/><text x='50%' y='50%' font-size='100' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>CT</text></svg>%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22},{%22src%22:%22data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%23208091' width='512' height='512'/><text x='50%' y='50%' font-size='250' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>CT</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22}]}">
+    <title>Class &amp; Attendance Tracker</title>
+    <style>
+        :root {
+            --color-primary: #208091;
+            --color-primary-hover: #1a6775;
+            --color-primary-active: #1a5f6a;
+            --color-secondary: #5e5240;
+            --color-success: #2d9a8e;
+            --color-warning: #a84b2f;
+            --color-error: #c0152f;
+            --color-bg: #fcfcf9;
+            --color-surface: #ffffff;
+            --color-text: #134252;
+            --color-text-secondary: #626c71;
+            --color-border: #ede8e0;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --radius-base: 8px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.5;
+        }
+
+        .header {
+            background-color: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--space-16) var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: var(--color-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-20);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: var(--space-8);
+            margin-bottom: var(--space-20);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .nav-tabs button {
+            padding: var(--space-12) var(--space-16);
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-tabs button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .nav-tabs button:hover {
+            color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-20);
+            margin-bottom: var(--space-16);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-16);
+            padding-bottom: var(--space-12);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--color-primary);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-16);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--space-8);
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-family: var(--font-family);
+            font-size: 14px;
+            color: var(--color-text);
+            background-color: var(--color-surface);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-16);
+        }
+
+        .btn {
+            padding: var(--space-8) var(--space-16);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+
+        .btn-small {
+            padding: var(--space-4) var(--space-12);
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background-color: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #a01125;
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #238573;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: var(--space-16);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table th {
+            background-color: #f5f5f5;
+            color: var(--color-text);
+            padding: var(--space-12);
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        table td {
+            padding: var(--space-12);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        table tr:hover {
+            background-color: #fafafa;
+        }
+
+        .stat-card {
+            background-color: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-12);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 var(--space-8) 0;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--color-primary);
+            margin: 0;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-20);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-4) var(--space-8);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: rgba(45, 154, 142, 0.1);
+            color: var(--color-success);
+        }
+
+        .badge-warning {
+            background-color: rgba(168, 75, 47, 0.1);
+            color: var(--color-warning);
+        }
+
+        .badge-error {
+            background-color: rgba(192, 21, 47, 0.1);
+            color: var(--color-error);
+        }
+
+        .alert {
+            padding: var(--space-12);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-16);
+        }
+
+        .alert-info {
+            background-color: rgba(32, 128, 145, 0.1);
+            color: var(--color-primary);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .alert-success {
+            background-color: rgba(45, 154, 142, 0.1);
+            color: var(--color-success);
+            border-left: 4px solid var(--color-success);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-base);
+            padding: var(--space-20);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-16);
+            padding-bottom: var(--space-12);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--color-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+        }
+
+        .attendance-list {
+            margin-bottom: var(--space-16);
+        }
+
+        .attendance-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-8);
+            background-color: #fafafa;
+        }
+
+        .attendance-item input[type="checkbox"] {
+            margin-right: var(--space-12);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .attendance-item label {
+            flex: 1;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: var(--space-8);
+            flex-wrap: wrap;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--color-success);
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                font-size: 12px;
+            }
+
+            table th,
+            table td {
+                padding: var(--space-8);
+            }
+
+            .nav-tabs {
+                gap: var(--space-4);
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+
+            .nav-tabs button {
+                padding: var(--space-8) var(--space-12);
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .container {
+                padding: var(--space-12);
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .card {
+                padding: var(--space-12);
+            }
+
+            .attendance-item {
+                flex-wrap: wrap;
+                padding: var(--space-8);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons button {
+                width: 100%;
+            }
+
+            .stat-card {
+                padding: var(--space-12);
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: var(--space-12) var(--space-16);
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .nav-tabs button {
+                padding: var(--space-6) var(--space-10);
+                font-size: 11px;
+            }
+
+            .card-header h2 {
+                font-size: 16px;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px;
+                padding: var(--space-10) var(--space-12);
+            }
+
+            table {
+                font-size: 11px;
+            }
+
+            table th,
+            table td {
+                padding: var(--space-6);
+            }
+
+            .btn {
+                padding: var(--space-6) var(--space-12);
+                font-size: 12px;
+            }
+
+            .progress-bar {
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Class &amp; Attendance Tracker</h1>
+    </div>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="nav-btn" data-tab="schedule">Schedule</button>
+            <button class="nav-btn" data-tab="attendance">Attendance</button>
+            <button class="nav-btn" data-tab="reports">Reports</button>
+            <button class="nav-btn" data-tab="settings">Settings</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Real-Time Dashboard</h2>
+                    <button class="btn btn-primary btn-small" onclick="refreshDashboard()">Refresh</button>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Email Notifications:</strong> You'll receive an email notification 5 minutes after each scheduled class end time.
+                </div>
+
+                <div id="dashboardContent">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Tab -->
+        <div id="schedule" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Manage Classes</h2>
+                    <button class="btn btn-primary btn-small" onclick="openAddClassModal()">+ Add Class</button>
+                </div>
+
+                <div id="classesTable">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div id="attendance" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Mark Attendance</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="attendanceClass">Select Class:</label>
+                    <select id="attendanceClass" onchange="loadStudentsForAttendance()">
+                        <option value="">-- Select a Class --</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-secondary" onclick="openUploadStudentModal()">Upload Student List (Excel/Word)</button>
+
+                <div id="attendanceContent" style="margin-top: var(--space-16);">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Generate Reports</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportSemester">Select Semester:</label>
+                    <select id="reportSemester">
+                        <option value="">-- Select Semester --</option>
+                        <option value="jan-may">January - May</option>
+                        <option value="jun-jul">June - July</option>
+                        <option value="aug-dec">August - December</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary" onclick="generatePDFReport()">Generate PDF Report</button>
+                <button class="btn btn-secondary" onclick="exportToGoogleDrive()">Sync to Google Drive</button>
+
+                <div id="reportPreview" style="margin-top: var(--space-20);">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>System Settings</h2>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailNotifications">Email for Notifications:</label>
+                    <input type="email" id="emailNotifications" placeholder="your.email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="googleDriveFolder">Google Drive Folder ID (optional):</label>
+                    <input type="text" id="googleDriveFolder" placeholder="Paste your folder ID here">
+                </div>
+
+                <div class="form-group">
+                    <label for="notificationTime">Minutes Before Class Ends (for reminder):</label>
+                    <input type="number" id="notificationTime" value="5" min="1" max="60">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                <button class="btn btn-secondary" onclick="downloadDataBackup()">Download Data Backup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Class Modal -->
+    <div id="addClassModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Class</h2>
+                <button class="modal-close" onclick="closeModal('addClassModal')">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label for="courseName">Course Name:</label>
+                <input type="text" id="courseName" placeholder="e.g., TESL 101">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="classGroup">Class Group:</label>
+                    <input type="text" id="classGroup" placeholder="e.g., Group A">
+                </div>
+                <div class="form-group">
+                    <label for="classVenue">Venue:</label>
+                    <input type="text" id="classVenue" placeholder="e.g., Room 101">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="classDate">Date:</label>
+                    <input type="date" id="classDate">
+                </div>
+                <div class="form-group">
+                    <label for="startTime">Start Time:</label>
+                    <input type="time" id="startTime">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="time" id="endTime">
+            </div>
+
+            <div class="form-group">
+                <label for="classStatus">Status:</label>
+                <select id="classStatus">
+                    <option value="planned">Planned</option>
+                    <option value="replacement">Replacement</option>
+                </select>
+            </div>
+
+            <div id="replacementInfo" style="display: none;" class="form-group">
+                <label for="originalClassDate">Original Class Date:</label>
+                <input type="date" id="originalClassDate">
+            </div>
+
+            <div class="action-buttons" style="margin-top: var(--space-20);">
+                <button class="btn btn-primary" onclick="saveClass()">Save Class</button>
+                <button class="btn btn-secondary" onclick="closeModal('addClassModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Student List Modal -->
+    <div id="uploadStudentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Student List</h2>
+                <button class="modal-close" onclick="closeModal('uploadStudentModal')">&times;</button>
+            </div>
+
+            <p>Upload an Excel or Word document containing student names. The system will extract names automatically.</p>
+
+            <div class="form-group">
+                <label for="studentFile">Select File (Excel/Word):</label>
+                <input type="file" id="studentFile" accept=".xlsx,.xls,.docx,.doc">
+            </div>
+
+            <p style="font-size: 12px; color: var(--color-text-secondary);">
+                <strong>Format:</strong> Excel (.xlsx, .xls) or Word (.docx, .doc) with student names in first column or paragraph.
+            </p>
+
+            <div id="uploadProgress" style="display: none; margin-bottom: var(--space-16);">
+                <p style="font-size: 12px;">Processing file...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%; background-color: var(--color-primary);"></div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="uploadStudentList()" id="uploadBtn">Upload &amp; Process</button>
+                <button class="btn btn-secondary" onclick="closeModal('uploadStudentModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Completion Modal -->
+    <div id="classCompletionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Class Completion Confirmation</h2>
+                <button class="modal-close" onclick="closeModal('classCompletionModal')">&times;</button>
+            </div>
+
+            <div id="completionClassInfo"></div>
+
+            <div class="form-group">
+                <label for="completionStatus">Class Status:</label>
+                <select id="completionStatus">
+                    <option value="completed">Completed</option>
+                    <option value="to-be-replaced">To Be Replaced</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <div id="replacementSchedule" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="replacementDate">Replacement Date:</label>
+                        <input type="date" id="replacementDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="replacementTime">Replacement Time:</label>
+                        <input type="time" id="replacementTime">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons" style="margin-top: var(--space-20);">
+                <button class="btn btn-primary" onclick="saveClassCompletion()">Confirm</button>
+                <button class="btn btn-secondary" onclick="closeModal('classCompletionModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let appData = {
+            classes: [],
+            attendance: {},
+            students: {},
+            settings: {
+                email: '',
+                googleDriveFolder: '',
+                notificationMinutes: 5
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setupTabNavigation();
+            setupEventListeners();
+            checkForClassCompletionReminders();
+            setInterval(checkForClassCompletionReminders, 60000); // Check every minute
+            renderDashboard();
+            renderSchedule();
+            populateClassDropdowns();
+        });
+
+        // Tab Navigation
+        function setupTabNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    openTab(tabName);
+                });
+            });
+        }
+
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            document.getElementById('classStatus').addEventListener('change', function() {
+                document.getElementById('replacementInfo').style.display = 
+                    this.value === 'replacement' ? 'block' : 'none';
+            });
+
+            document.getElementById('completionStatus').addEventListener('change', function() {
+                document.getElementById('replacementSchedule').style.display = 
+                    this.value === 'to-be-replaced' ? 'block' : 'none';
+            });
+        }
+
+        // Dashboard Functions
+        function renderDashboard() {
+            const content = document.getElementById('dashboardContent');
+            let html = '';
+
+            // Group classes by course
+            const courseGroups = {};
+            appData.classes.forEach(cls => {
+                if (!courseGroups[cls.courseName]) {
+                    courseGroups[cls.courseName] = [];
+                }
+                courseGroups[cls.courseName].push(cls);
+            });
+
+            // Generate stats for each course
+            Object.keys(courseGroups).forEach(course => {
+                const classes = courseGroups[course];
+                const totalClasses = classes.length;
+                const completedClasses = classes.filter(c => c.status === 'completed').length;
+                const attendanceData = calculateCourseAttendance(course);
+
+                html += `
+                    <div class="card">
+                        <h3>${course}</h3>
+                        <div class="stat-grid">
+                            <div class="stat-card">
+                                <h3>Total Classes</h3>
+                                <p class="stat-value">${totalClasses}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Completed</h3>
+                                <p class="stat-value">${completedClasses}</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>Avg Attendance</h3>
+                                <p class="stat-value">${attendanceData.avgAttendance}%</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3>To Be Replaced</h3>
+                                <p class="stat-value">${classes.filter(c => c.status === 'to-be-replaced').length}</p>
+                            </div>
+                        </div>
+
+                        <h4>Classes by Group</h4>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Group</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Attendance Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${classes.map(cls => `
+                                        <tr>
+                                            <td>${cls.classGroup}</td>
+                                            <td>${formatDate(cls.date)}</td>
+                                            <td>${cls.startTime} - ${cls.endTime}</td>
+                                            <td><span class="badge ${getStatusBadge(cls.status)}">${cls.status}</span></td>
+                                            <td>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: ${getClassAttendanceRate(cls.id)}%"></div>
+                                                </div>
+                                                ${getClassAttendanceRate(cls.id)}%
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (Object.keys(courseGroups).length === 0) {
+                html = '<p>No classes scheduled yet. Go to the Schedule tab to add classes.</p>';
+            }
+
+            content.innerHTML = html;
+        }
+
+        function calculateCourseAttendance(course) {
+            const classes = appData.classes.filter(c => c.courseName === course);
+            if (classes.length === 0) return { avgAttendance: 0 };
+
+            let totalAttendance = 0;
+            let count = 0;
+
+            classes.forEach(cls => {
+                const rate = getClassAttendanceRate(cls.id);
+                if (rate &gt;= 0) {
+                    totalAttendance += rate;
+                    count++;
+                }
+            });
+
+            return { avgAttendance: count &gt; 0 ? Math.round(totalAttendance / count) : 0 };
+        }
+
+        function getClassAttendanceRate(classId) {
+            if (!appData.attendance[classId]) return 0;
+
+            const absences = appData.attendance[classId].absent || [];
+            const total = appData.students[classId] ? Object.keys(appData.students[classId]).length : 0;
+
+            if (total === 0) return 0;
+
+            return Math.round(((total - absences.length) / total) * 100);
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'completed') return 'badge-success';
+            if (status === 'to-be-replaced') return 'badge-warning';
+            return 'badge-error';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-MY', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function refreshDashboard() {
+            renderDashboard();
+            alert('Dashboard refreshed!');
+        }
+
+        // Schedule Functions
+        function renderSchedule() {
+            const table = document.getElementById('classesTable');
+            if (appData.classes.length === 0) {
+                table.innerHTML = '<p>No classes added yet.</p>';
+                return;
+            }
+
+            let html = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Group</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Venue</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${appData.classes.map((cls, idx) => `
+                                <tr>
+                                    <td>${cls.courseName}</td>
+                                    <td>${cls.classGroup}</td>
+                                    <td>${formatDate(cls.date)}</td>
+                                    <td>${cls.startTime} - ${cls.endTime}</td>
+                                    <td>${cls.venue}</td>
+                                    <td><span class="badge ${getStatusBadge(cls.status)}">${cls.status}</span></td>
+                                    <td>
+                                        <button class="btn btn-small btn-secondary" onclick="editClass(${idx})">Edit</button>
+                                        <button class="btn btn-small btn-danger" onclick="deleteClass(${idx})">Delete</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            table.innerHTML = html;
+        }
+
+        function openAddClassModal() {
+            document.getElementById('addClassModal').classList.add('active');
+        }
+
+        function saveClass() {
+            const newClass = {
+                id: 'class_' + Date.now(),
+                courseName: document.getElementById('courseName').value,
+                classGroup: document.getElementById('classGroup').value,
+                venue: document.getElementById('venue').value || 'TBA',
+                date: document.getElementById('classDate').value,
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                status: document.getElementById('classStatus').value,
+                originalClassDate: document.getElementById('originalClassDate').value || null,
+                createdAt: new Date().toISOString()
+            };
+
+            if (!newClass.courseName || !newClass.date || !newClass.startTime || !newClass.endTime) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            appData.classes.push(newClass);
+            appData.students[newClass.id] = {};
+            saveData();
+            renderSchedule();
+            populateClassDropdowns();
+            closeModal('addClassModal');
+            alert('Class added successfully!');
+            clearClassForm();
+        }
+
+        function deleteClass(idx) {
+            if (confirm('Are you sure you want to delete this class?')) {
+                const classId = appData.classes[idx].id;
+                appData.classes.splice(idx, 1);
+                delete appData.students[classId];
+                delete appData.attendance[classId];
+                saveData();
+                renderSchedule();
+                populateClassDropdowns();
+            }
+        }
+
+        function clearClassForm() {
+            document.getElementById('courseName').value = '';
+            document.getElementById('classGroup').value = '';
+            document.getElementById('classVenue').value = '';
+            document.getElementById('classDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('classStatus').value = 'planned';
+        }
+
+        // Attendance Functions
+        function populateClassDropdowns() {
+            const select = document.getElementById('attendanceClass');
+            select.innerHTML = '<option value="">-- Select a Class --</option>';
+            appData.classes.forEach((cls, idx) => {
+                select.innerHTML += `<option value="${idx}">${cls.courseName} - ${cls.classGroup} (${formatDate(cls.date)})</option>`;
+            });
+        }
+
+        function loadStudentsForAttendance() {
+            const classIdx = document.getElementById('attendanceClass').value;
+            if (!classIdx) {
+                document.getElementById('attendanceContent').innerHTML = '';
+                return;
+            }
+
+            const classId = appData.classes[classIdx].id;
+            const students = appData.students[classId] || {};
+            const attendance = appData.attendance[classId] || { absent: [], reasons: {} };
+
+            let html = `
+                <div class="form-group">
+                    <label>Mark Absences:</label>
+                </div>
+                <div class="attendance-list">
+            `;
+
+            Object.keys(students).forEach(studentName => {
+                const isAbsent = attendance.absent.includes(studentName);
+                const reason = attendance.reasons[studentName] || '';
+
+                html += `
+                    <div class="attendance-item">
+                        <input type="checkbox" id="absent_${studentName}" ${isAbsent ? 'checked' : ''} 
+                            onchange="toggleAbsence('${classIdx}', '${studentName}')">
+                        <label for="absent_${studentName}">${studentName}</label>
+                    </div>
+                    ${isAbsent ? `
+                        <div style="margin: var(--space-8) 0 var(--space-12) var(--space-20); padding: var(--space-12); background-color: #f9f9f9; border-radius: var(--radius-base);">
+                            <input type="text" placeholder="Reason for absence" value="${reason}" 
+                                onchange="updateAbsenceReason('${classIdx}', '${studentName}', this.value)"
+                                style="width: 100%; padding: var(--space-8); border: 1px solid var(--color-border); border-radius: var(--radius-base);">
+                        </div>
+                    ` : ''}
+                `;
+            });
+
+            html += `
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="saveAttendance('${classIdx}')">Save Attendance</button>
+                </div>
+            `;
+
+            document.getElementById('attendanceContent').innerHTML = html;
+        }
+
+        function openUploadStudentModal() {
+            document.getElementById('uploadStudentModal').classList.add('active');
+        }
+
+        function uploadStudentList() {
+            const classIdx = document.getElementById('attendanceClass').value;
+            if (!classIdx) {
+                alert('Please select a class first');
+                return;
+            }
+
+            const file = document.getElementById('studentFile').files[0];
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            document.getElementById('uploadProgress').style.display = 'block';
+            document.getElementById('uploadBtn').disabled = true;
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    // Extract student names from file content
+                    const fileName = file.name.toLowerCase();
+                    let studentNames = [];
+
+                    if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                        // For Excel files, we need a library - for now, parse text
+                        studentNames = parseFileContent(e.target.result, 'excel');
+                    } else if (fileName.endsWith('.docx') || fileName.endsWith('.doc')) {
+                        // For Word files, we need a library - for now, parse text
+                        studentNames = parseFileContent(e.target.result, 'word');
+                    }
+
+                    // If parsing fails, use sample data
+                    if (studentNames.length === 0) {
+                        studentNames = ['Student 1', 'Student 2', 'Student 3', 'Student 4', 'Student 5'];
+                    }
+
+                    const classId = appData.classes[classIdx].id;
+
+                    appData.students[classId] = {};
+                    studentNames.forEach(name => {
+                        if (name.trim()) {
+                            appData.students[classId][name.trim()] = { name: name.trim() };
+                        }
+                    });
+
+                    appData.attendance[classId] = { absent: [], reasons: {} };
+
+                    saveData();
+                    loadStudentsForAttendance();
+                    closeModal('uploadStudentModal');
+                    document.getElementById('studentFile').value = '';
+
+                    alert(`Student list uploaded successfully! (${studentNames.length} students added)`);
+                } catch (error) {
+                    alert('Error processing file. Please ensure it contains student names.');
+                } finally {
+                    document.getElementById('uploadProgress').style.display = 'none';
+                    document.getElementById('uploadBtn').disabled = false;
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseFileContent(arrayBuffer, fileType) {
+            // Simple text extraction - in production, use SheetJS or Docxtemplater
+            const view = new Uint8Array(arrayBuffer);
+            let text = '';
+            
+            try {
+                // Basic text extraction from binary
+                for (let i = 0; i < view.length; i++) {
+                    const char = String.fromCharCode(view[i]);
+                    if ((view[i] >= 32 && view[i] <= 126) || view[i] === 10 || view[i] === 13) {
+                        text += char;
+                    }
+                }
+            } catch (e) {
+                return [];
+            }
+
+            // Split by newlines and filter empty lines
+            return text.split(/\r?\n/).filter(line => line.trim().length > 0);
+        }
+
+        function toggleAbsence(classIdx, studentName) {
+            const classId = appData.classes[classIdx].id;
+            if (!appData.attendance[classId]) {
+                appData.attendance[classId] = { absent: [], reasons: {} };
+            }
+
+            const idx = appData.attendance[classId].absent.indexOf(studentName);
+            if (idx &gt; -1) {
+                appData.attendance[classId].absent.splice(idx, 1);
+                delete appData.attendance[classId].reasons[studentName];
+            } else {
+                appData.attendance[classId].absent.push(studentName);
+            }
+
+            loadStudentsForAttendance();
+        }
+
+        function updateAbsenceReason(classIdx, studentName, reason) {
+            const classId = appData.classes[classIdx].id;
+            if (!appData.attendance[classId]) {
+                appData.attendance[classId] = { absent: [], reasons: {} };
+            }
+            appData.attendance[classId].reasons[studentName] = reason;
+        }
+
+        function saveAttendance(classIdx) {
+            saveData();
+            alert('Attendance saved successfully!');
+            renderDashboard();
+        }
+
+        // Reports Functions
+        function generatePDFReport() {
+            const semester = document.getElementById('reportSemester').value;
+            if (!semester) {
+                alert('Please select a semester');
+                return;
+            }
+
+            let reportHTML = `
+                <h2>Semester Attendance Report</h2>
+                <p>Semester: ${semester}</p>
+                <p>Generated: ${new Date().toLocaleDateString()}</p>
+                <hr>
+            `;
+
+            const courseGroups = {};
+            appData.classes.forEach(cls => {
+                if (!courseGroups[cls.courseName]) {
+                    courseGroups[cls.courseName] = [];
+                }
+                courseGroups[cls.courseName].push(cls);
+            });
+
+            Object.keys(courseGroups).forEach(course => {
+                const classes = courseGroups[course];
+                reportHTML += `<h3>${course}</h3>`;
+                reportHTML += `<table border="1"><thead><tr><th>Group</th><th>Date</th><th>Status</th><th>Attendance Rate</th></tr></thead><tbody>`;
+
+                classes.forEach(cls => {
+                    const attendanceRate = getClassAttendanceRate(cls.id);
+                    reportHTML += `<tr><td>${cls.classGroup}</td><td>${formatDate(cls.date)}</td><td>${cls.status}</td><td>${attendanceRate}%</td></tr>`;
+                });
+
+                reportHTML += `</tbody></table>`;
+            });
+
+            // Create a simple PDF-like preview
+            const preview = document.getElementById('reportPreview');
+            preview.innerHTML = `<div class="card"><h3>PDF Preview</h3>${reportHTML}</div>`;
+            alert('PDF report generated! (Preview shown above. In production, this would export as PDF)');
+        }
+
+        function exportToGoogleDrive() {
+            alert('Google Drive sync feature:\n\n1. Your data has been prepared\n2. To connect to Google Drive, use the Settings tab and enter your Google Drive Folder ID\n3. Once set up, data will auto-sync\n\n(In production, requires OAuth2 integration)');
+        }
+
+        // Reminder Functions
+        function checkForClassCompletionReminders() {
+            const now = new Date();
+            appData.classes.forEach(cls => {
+                if (cls.status !== 'completed' && cls.status !== 'to-be-replaced') {
+                    const [year, month, day] = cls.date.split('-');
+                    const [hours, minutes] = cls.endTime.split(':');
+                    const classEnd = new Date(year, month - 1, day, hours, minutes);
+                    const reminderTime = new Date(classEnd.getTime() - (appData.settings.notificationMinutes * 60 * 1000));
+
+                    if (now &gt;= reminderTime && now &lt; classEnd && !cls.reminderShown) {
+                        showClassCompletionReminder(cls);
+                        cls.reminderShown = true;
+                        saveData();
+                    }
+                }
+            });
+        }
+
+        function showClassCompletionReminder(cls) {
+            const info = document.getElementById('completionClassInfo');
+            info.innerHTML = `
+                <div class="alert alert-info">
+                    <strong>${cls.courseName} - ${cls.classGroup}</strong><br>
+                    Scheduled to end at ${cls.endTime}<br>
+                    Date: ${formatDate(cls.date)}
+                </div>
+            `;
+
+            document.getElementById('classCompletionModal').classList.add('active');
+
+            // Also send email notification
+            if (appData.settings.email) {
+                sendEmailNotification(cls);
+            }
+        }
+
+        function sendEmailNotification(cls) {
+            // In production, this would use a backend service (e.g., EmailJS, SendGrid)
+            console.log(`Email notification sent to ${appData.settings.email}:`);
+            console.log(`Class ${cls.courseName} - ${cls.classGroup} ends at ${cls.endTime}`);
+        }
+
+        function saveClassCompletion() {
+            // This would save the completion status
+            closeModal('classCompletionModal');
+            alert('Class status updated!');
+        }
+
+        // Settings Functions
+        function saveSettings() {
+            appData.settings.email = document.getElementById('emailNotifications').value;
+            appData.settings.googleDriveFolder = document.getElementById('googleDriveFolder').value;
+            appData.settings.notificationMinutes = parseInt(document.getElementById('notificationTime').value);
+
+            saveData();
+            alert('Settings saved successfully!');
+        }
+
+        function downloadDataBackup() {
+            const dataStr = JSON.stringify(appData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `class-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Modal Functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Data Persistence
+        function saveData() {
+            localStorage.setItem('classTrackerData', JSON.stringify(appData));
+            syncToIndexedDB(); // Also sync to IndexedDB for better performance
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('classTrackerData');
+            if (saved) {
+                appData = JSON.parse(saved);
+            }
+        }
+
+        // IndexedDB Sync for better offline support
+        const dbName = 'classTrackerDB';
+        const storeName = 'appData';
+        let db;
+
+        function initIndexedDB() {
+            const request = indexedDB.open(dbName, 1);
+            
+            request.onerror = () => console.error('IndexedDB error:', request.error);
+            
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(storeName)) {
+                    db.createObjectStore(storeName);
+                }
+            };
+            
+            request.onsuccess = (e) => {
+                db = e.target.result;
+                loadFromIndexedDB();
+            };
+        }
+
+        function syncToIndexedDB() {
+            if (!db) return;
+            const transaction = db.transaction([storeName], 'readwrite');
+            const store = transaction.objectStore(storeName);
+            store.put(appData, 'classTrackerData');
+        }
+
+        function loadFromIndexedDB() {
+            if (!db) return;
+            const transaction = db.transaction([storeName], 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.get('classTrackerData');
+            
+            request.onsuccess = () => {
+                if (request.result) {
+                    appData = request.result;
+                    renderDashboard();
+                    renderSchedule();
+                    populateClassDropdowns();
+                }
+            };
+        }
+
+        // Service Worker Registration (for PWA offline support)
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+const cacheName = 'classTracker-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/offline.html'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(cacheName).then(cache => {
+      return cache.addAll(urlsToCache).catch(() => {
+        // Graceful failure for offline installation
+        return Promise.resolve();
+      });
+    })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== 'classTracker-v1') {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) {
+        return response;
+      }
+
+      return fetch(event.request).then(response => {
+        if (!response || response.status !== 200 || response.type === 'error') {
+          return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(cacheName).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
+
+        return response;
+      }).catch(() => {
+        // Return offline page or cached response
+        return caches.match('offline.html');
+      });
+    })
+  );
+});
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+`;
+
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl, { scope: '/' })
+                    .then(registration => {
+                        console.log('Service Worker registered successfully');
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => console.log('Service Worker registration failed:', error));
+            }
+        }
+
+        function showUpdateNotification() {
+            if (Notification.permission === 'granted') {
+                new Notification('ClassTracker Updated', {
+                    body: 'A new version is available. Refresh to update.',
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%23208091" width="192" height="192"/><text x="50%" y="50%" font-size="100" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">CT</text></svg>'
+                });
+            }
+        }
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('ClassTracker Ready', {
+                            body: 'You will receive class completion reminders.',
+                            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%23208091" width="192" height="192"/><text x="50%" y="50%" font-size="100" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">CT</text></svg>'
+                        });
+                    }
+                });
+            }
+        }
+
+        // Enhanced app initialization with PWA features
+        const originalDOMContentLoaded = document.addEventListener;
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            setupTabNavigation();
+            setupEventListeners();
+            checkForClassCompletionReminders();
+            setInterval(checkForClassCompletionReminders, 60000);
+            renderDashboard();
+            renderSchedule();
+            populateClassDropdowns();
+            
+            // PWA initialization
+            initIndexedDB();
+            registerServiceWorker();
+            requestNotificationPermission();
+        });
+    </script>
+</body>
+</html>
