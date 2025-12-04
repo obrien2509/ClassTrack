@@ -1311,7 +1311,7 @@
                     const classEnd = new Date(year, month - 1, day, hours, minutes);
                     const reminderTime = new Date(classEnd.getTime() - (appData.settings.notificationMinutes * 60 * 1000));
 
-                    if (now >= reminderTime && now &lt; classEnd && !cls.reminderShown) {
+                    if (now >= reminderTime && now < classEnd && !cls.reminderShown) {
                         showClassCompletionReminder(cls);
                         cls.reminderShown = true;
                         saveData();
