@@ -940,13 +940,13 @@
 
             classes.forEach(cls => {
                 const rate = getClassAttendanceRate(cls.id);
-                if (rate &gt;= 0) {
+                if (rate >= 0) {
                     totalAttendance += rate;
                     count++;
                 }
             });
 
-            return { avgAttendance: count &gt; 0 ? Math.round(totalAttendance / count) : 0 };
+            return { avgAttendance: count >; 0 ? Math.round(totalAttendance / count) : 0 };
         }
 
         function getClassAttendanceRate(classId) {
@@ -1230,7 +1230,7 @@
             }
 
             const idx = appData.attendance[classId].absent.indexOf(studentName);
-            if (idx &gt; -1) {
+            if (idx >; -1) {
                 appData.attendance[classId].absent.splice(idx, 1);
                 delete appData.attendance[classId].reasons[studentName];
             } else {
@@ -1310,7 +1310,7 @@
                     const classEnd = new Date(year, month - 1, day, hours, minutes);
                     const reminderTime = new Date(classEnd.getTime() - (appData.settings.notificationMinutes * 60 * 1000));
 
-                    if (now &gt;= reminderTime && now &lt; classEnd && !cls.reminderShown) {
+                    if (now >;= reminderTime && now &lt; classEnd && !cls.reminderShown) {
                         showClassCompletionReminder(cls);
                         cls.reminderShown = true;
                         saveData();
